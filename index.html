@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MAK Movies</title>
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+<style>
+body{margin:0;font-family:sans-serif;background:#0a0a0a;color:#fff}
+
+/* HEADER */
+.header{display:flex;justify-content:space-between;padding:15px;background:#000}
+.icon{cursor:pointer}
+
+/* SEARCH */
+.search-box{display:none;padding:10px;background:#111;}
+.search-box input{width:100%;padding:10px;border:none;border-radius:8px}
+
+/* SIDE MENU */
+.side-menu{
+  position:fixed;top:0;left:-270px;
+  width:260px;height:100vh;background:#111;
+  padding:20px;transition:.3s;z-index:1000;
+}
+.side-menu.active{left:0}
+.menu-item{padding:12px 0;border-bottom:1px solid #222}
+
+/* OVERLAY */
+.overlay{
+  position:fixed;width:100%;height:100%;
+  background:rgba(0,0,0,.6);display:none;
+}
+.overlay.active{display:block}
+
+/* SLIDER */
+.slider{padding:10px}
+.slide-box{position:relative;border-radius:14px;overflow:hidden}
+.slides{display:flex;transition:.5s}
+.slide{min-width:100%}
+.slide img{width:100%}
+
+/* CAPTION */
+.caption{position:absolute;bottom:20px;left:20px}
+
+/* GLASS BUTTON */
+.glass-btn{
+  padding:6px 14px;border-radius:20px;
+  background:rgba(255,255,255,0.15);
+  backdrop-filter:blur(10px);
+  border:1px solid rgba(255,255,255,0.3);
+  color:#fff;font-size:12px;
+}
+
+/* DOTS */
+.dots{position:absolute;bottom:10px;width:100%;text-align:center}
+.dots span{
+  width:6px;height:6px;background:#777;
+  margin:3px;border-radius:50%;display:inline-block;
+}
+.dots .active{background:#fff}
+
+/* SECTION */
+.section{padding:15px}
+.section-header{
+  display:flex;justify-content:space-between;align-items:center;
+}
+
+/* ROW */
+.row{display:flex;gap:10px;overflow-x:auto;margin-top:10px}
+.card{min-width:120px;position:relative;cursor:pointer}
+.card img{width:100%;border-radius:10px}
+
+/* TOP MOVIES NUMBER */
+.rank{
+  position:absolute;bottom:5px;left:5px;
+  font-size:40px;font-weight:bold;
+  padding:5px 12px;border-radius:10px;
+  background:rgba(255,255,255,0.15);
+  backdrop-filter:blur(10px);
+}
+
+/* POPUP */
+.popup{
+  position:fixed;bottom:20px;left:50%;
+  transform:translateX(-50%);
+  background:#111;padding:10px 20px;
+  border-radius:10px;display:none;
+}
+
+.row::-webkit-scrollbar{display:none}
+</style>
+</head>
+
+<body>
+
+<!-- MENU -->
+<div class="side-menu" id="menu">
+  <h3>Languages</h3>
+  <div class="menu-item">Kannada</div>
+  <div class="menu-item">Tamil</div>
+  <div class="menu-item">Hindi</div>
+  <div class="menu-item">Telugu</div>
+  <div class="menu-item">Malayalam</div>
+</div>
+<div class="overlay" id="overlay"></div>
+
+<!-- HEADER -->
+<div class="header">
+  <i class="fas fa-bars icon" onclick="openMenu()"></i>
+  <h2>MAK</h2>
+  <i class="fas fa-search icon" onclick="toggleSearch()"></i>
+</div>
+
+<!-- SEARCH -->
+<div class="search-box" id="searchBox">
+  <input type="text" id="searchInput" placeholder="Search movies...">
+</div>
+
+<!-- SLIDER -->
+<div class="slider">
+  <div class="slide-box">
+    <div class="slides" id="slides">
+      <div class="slide"><img src="https://picsum.photos/800/400?1"><div class="caption"><h2>KGF</h2><button class="glass-btn">Watch</button></div></div>
+      <div class="slide"><img src="https://picsum.photos/800/400?2"><div class="caption"><h2>Salaar</h2><button class="glass-btn">Watch</button></div></div>
+      <div class="slide"><img src="https://picsum.photos/800/400?3"><div class="caption"><h2>Pushpa</h2><button class="glass-btn">Watch</button></div></div>
+    </div>
+    <div class="dots" id="dots"></div>
+  </div>
+</div>
+
+<!-- FUNCTION TO CREATE CARDS -->
+<script>
+function card(name,img){
+  return `<div class="card" data-name="${name}" onclick="showName('${name}')">
+            <img src="${img}">
+          </div>`;
+}
+</script>
+
+<!-- SECTIONS -->
+<div class="section"><div class="section-header"><h3>Recently Added</h3><button class="glass-btn">More</button></div>
+<div class="row movies" id="recent"></div></div>
+
+<div class="section"><div class="section-header"><h3>Latest Movies</h3><button class="glass-btn">More</button></div>
+<div class="row movies" id="latest"></div></div>
+
+<div class="section"><div class="section-header"><h3>All Movies</h3><button class="glass-btn">More</button></div>
+<div class="row movies" id="all"></div></div>
+
+<div class="section"><div class="section-header"><h3>Series</h3><button class="glass-btn">More</button></div>
+<div class="row movies" id="series"></div></div>
+
+<div class="section"><div class="section-header"><h3>🔥 Top Movies</h3><button class="glass-btn">More</button></div>
+<div class="row movies" id="top"></div></div>
+
+<!-- POPUP -->
+<div class="popup" id="popup"></div>
+
+<script>
+// DATA
+let movies=["KGF","Salaar","Pushpa","Leo","Jailer","Vikram"];
+
+// LOAD SECTIONS
+movies.forEach((m,i)=>{
+  document.getElementById("recent").innerHTML+=card(m,`https://picsum.photos/150/220?${i}`);
+  document.getElementById("latest").innerHTML+=card(m,`https://picsum.photos/150/220?${i+10}`);
+  document.getElementById("all").innerHTML+=card(m,`https://picsum.photos/150/220?${i+20}`);
+  document.getElementById("series").innerHTML+=card("Series "+i,`https://picsum.photos/150/220?${i+30}`);
+
+  document.getElementById("top").innerHTML+=
+  `<div class="card" data-name="${m}" onclick="showName('${m}')">
+    <span class="rank">${i+1}</span>
+    <img src="https://picsum.photos/150/220?${i+40}">
+  </div>`;
+});
+
+// POPUP
+function showName(name){
+  popup.innerText=name;
+  popup.style.display="block";
+  setTimeout(()=>popup.style.display="none",2000);
+}
+
+// MENU
+function openMenu(){menu.classList.add("active");overlay.classList.add("active");}
+overlay.onclick=()=>{menu.classList.remove("active");overlay.classList.remove("active");}
+
+// SEARCH
+function toggleSearch(){searchBox.style.display=searchBox.style.display=="block"?"none":"block";}
+searchInput.onkeyup=()=>{
+  let val=searchInput.value.toLowerCase();
+  document.querySelectorAll("[data-name]").forEach(el=>{
+    el.style.display = el.dataset.name.toLowerCase().includes(val)?"block":"none";
+  });
+}
+
+// SLIDER
+let index=0,total=3;
+let dots=document.getElementById("dots");
+for(let i=0;i<total;i++){
+  let d=document.createElement("span");
+  if(i==0)d.classList.add("active");
+  dots.appendChild(d);
+}
+let dotItems=dots.children;
+function update(){
+  slides.style.transform="translateX(-"+index*100+"%)";
+  for(let d of dotItems)d.classList.remove("active");
+  dotItems[index].classList.add("active");
+}
+setInterval(()=>{index=(index+1)%total;update();},3000);
+</script>
+
+</body>
+</html>
