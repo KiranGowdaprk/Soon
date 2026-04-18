@@ -18,15 +18,6 @@ body{margin:0;font-family:sans-serif;background:#0a0a0a;color:#fff}
 .search-box{display:none;padding:10px;background:#111;}
 .search-box input{width:100%;padding:10px;border:none;border-radius:8px}
 
-/* SIDE MENU */
-.side-menu{
-  position:fixed;top:0;left:-270px;
-  width:260px;height:100vh;background:#111;
-  padding:20px;transition:.3s;z-index:1000;
-}
-.side-menu.active{left:0}
-.menu-item{padding:12px 0;border-bottom:1px solid #222}
-
 /* OVERLAY */
 .overlay{
   position:fixed;width:100%;height:100%;
@@ -95,17 +86,7 @@ body{margin:0;font-family:sans-serif;background:#0a0a0a;color:#fff}
 
 <body>
 
-<!-- MENU -->
-<div class="side-menu" id="menu">
-  <h3>Languages</h3>
-  <div class="menu-item">Kannada</div>
-  <div class="menu-item">Tamil</div>
-  <div class="menu-item">Hindi</div>
-  <div class="menu-item">Telugu</div>
-  <div class="menu-item">Malayalam</div>
-</div>
-<div class="overlay" id="overlay"></div>
-
+  
 <!-- HEADER -->
 <div class="header">
   <i class="fas fa-bars icon" onclick="openMenu()"></i>
